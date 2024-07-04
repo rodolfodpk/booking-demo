@@ -1,4 +1,4 @@
-package com.booking.impl;
+package com.booking.repository;
 
 import com.booking.core.BookingData.Booking;
 import com.booking.core.BookingRepository;

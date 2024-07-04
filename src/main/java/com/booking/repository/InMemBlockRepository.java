@@ -1,4 +1,4 @@
-package com.booking.impl;
+package com.booking.repository;
 
 import com.booking.core.BlockRepository;
 import com.booking.core.BookingData;
