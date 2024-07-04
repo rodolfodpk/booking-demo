@@ -2,8 +2,8 @@ package com.booking.controller;
 
 import com.booking.core.BlockRepository;
 import com.booking.core.BookingData.Block;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/blocks")
@@ -25,13 +26,18 @@ public class BlocksController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createBlock(@RequestBody Block block) {
+    public ResponseEntity<?> createBlock(@RequestBody @Valid Block block) {
         blockRepository.createBlock(block);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        var location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(block.id())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Block> updateBlock(@PathVariable int id, @RequestBody Block block) {
+    public ResponseEntity<Block> updateBlock(@PathVariable int id, @RequestBody @Valid Block block) {
         var updatedBlock = blockRepository.updateBlock(id, block);
         if (updatedBlock.isPresent()) {
             return ResponseEntity.ok().build();

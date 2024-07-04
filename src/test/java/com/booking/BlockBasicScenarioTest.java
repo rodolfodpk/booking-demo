@@ -29,6 +29,8 @@ public class BlockBasicScenarioTest {
     public void whenAddingNewBlock() {
         var response = restTemplate.postForEntity("/blocks", block1, Block.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        var location = response.getHeaders().getLocation();
+        assertThat(location.getPath()).endsWith("/blocks/" + block1.id());
     }
 
     @Test

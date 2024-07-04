@@ -45,6 +45,8 @@ public class BookingBasicScenarioTest {
     public void whenAddingNewBooking() {
         var response = restTemplate.postForEntity("/bookings", booking1, Booking.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        var location = response.getHeaders().getLocation();
+        assertThat(location.getPath()).endsWith("/bookings/" + booking1.id());
     }
 
     @Test

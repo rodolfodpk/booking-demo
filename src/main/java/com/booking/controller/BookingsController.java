@@ -3,6 +3,7 @@ package com.booking.controller;
 import com.booking.core.BlockRepository;
 import com.booking.core.BookingData.Booking;
 import com.booking.core.BookingRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/bookings")
@@ -29,12 +31,17 @@ public class BookingsController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Booking booking) {
+    public ResponseEntity<?> create(@RequestBody @Valid Booking booking) {
         if (blockRepository.isBlocked(booking)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         bookingRepository.createBooking(booking);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        var location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(booking.id())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/{id}")
@@ -44,7 +51,7 @@ public class BookingsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable int id, @RequestBody Booking booking) {
+    public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid Booking booking) {
         var existingBooking = bookingRepository.updateBooking(id, booking);
         if (existingBooking.isEmpty()) {
             return ResponseEntity.notFound().build();
